@@ -1,7 +1,7 @@
 pragma solidity ^0.8.4;
 
 // Pay recurring bills like rent, water, security in intervals
-// Pay 0.0000030 eth per month to landlord
+// Pay eth per month to landlord
 
 contract Bills {
     // landlords address
