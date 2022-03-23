@@ -1,8 +1,5 @@
 pragma solidity ^0.8.4;
 
-// deposit money that will be held unti a certain date
-// when it can be withdrawn
-
 contract Savings {
     address payable beneficiary;
     uint public payDate;
