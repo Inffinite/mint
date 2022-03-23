@@ -1,9 +1,5 @@
 pragma solidity ^0.8.4;
 
-// people submit their hidden bids
-// the reveal their bids when the bidding ends
-// the highest bid after reveal time ends
-// wins the yatch
 
 contract YatchBlindAuction {
     struct Bid {
@@ -21,7 +17,6 @@ contract YatchBlindAuction {
     address public highestBidder;
     uint public highestBid;
 
-    // Allowed withdrawals of previous bids
     mapping(address => uint) pendingReturns;
 
     event AuctionEnded(address winner, uint highestBid);
@@ -50,15 +45,6 @@ contract YatchBlindAuction {
         revealEnd = biddingEnd + revealTime;
     }
 
-    /// Place a blinded bid with `blindedBid` =
-    /// keccak256(abi.encodePacked(value, fake, secret)).
-    /// The sent ether is only refunded if the bid is correctly
-    /// revealed in the revealing phase. The bid is valid if the
-    /// ether sent together with the bid is at least "value" and
-    /// "fake" is not true. Setting "fake" to true and sending
-    /// not the exact amount are ways to hide the real bid but
-    /// still make the required deposit. The same address can
-    /// place multiple bids.
 
     function bid(bytes32 blindedBid) external payable onlyBefore(biddingEnd){
         bids[msg.sender].push(Bid({
@@ -67,9 +53,6 @@ contract YatchBlindAuction {
         }));
     }
 
-    /// Reveal your blinded bids. You will get a refund for all
-    /// correctly blinded invalid bids and for all bids except for
-    /// the totally highest.
 
     function reveal(
         uint[] calldata values,
@@ -91,8 +74,6 @@ contract YatchBlindAuction {
             );
 
             if(bidToCheck.blindedBid != keccak256(abi.encodePacked(value, fake, secret))){
-                // Bid was not revealed
-                // do not refund deposit
                 continue;
             }
 
@@ -101,8 +82,6 @@ contract YatchBlindAuction {
                 if(placeBid(msg.sender, value))
                     refund -= value;
             }
-            // Make it impossible for sender to re-claim
-            // the same deposit
             bidToCheck.blindedBid = bytes32(0);
         }
         payable(msg.sender).transfer(refund);
@@ -123,9 +102,6 @@ contract YatchBlindAuction {
         beneficiary.transfer(highestBid);
     }
 
-    // internal function
-    // can only be called from the contract
-    // or from derived contracts
 
     function placeBid(address bidder, uint value) internal returns (bool success){
         if(value <= highestBid){
@@ -133,7 +109,6 @@ contract YatchBlindAuction {
         }
 
         if(highestBidder != address(0)){
-            // Refund the previously highest bidder.
             pendingReturns[highestBidder] += highestBid;
         }
         highestBid = value;
