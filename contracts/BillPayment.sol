@@ -1,22 +1,12 @@
 pragma solidity ^0.8.4;
 
-// Pay recurring bills like rent, water, security in intervals
-// Pay eth per month to landlord
-
-contract Bills {
-    // landlords address
+contract Bills 
     address payable public landlord;
-    // date after which rent can be paid
     uint public payDate;
-    // intervals of rent payment in seconds
     uint public payDuration;
-    // contract owners address
     address payable myAddress;
-    // amount of money in the contract
     uint public value;
-    // amount to be paid to the landlord each month
     uint public payment;
-    // is the contract active or dormant
     bool active;
 
     event Aborted();

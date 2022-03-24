@@ -1,11 +1,5 @@
 pragma solidity ^0.8.4;
 
-// buyer contributes twice the price of the product
-// seller contributes twice the amount of the product
-// the money is locked until the buyer confirms the product has been received
-// once received the seller can withdraw thrice the value
-// and the buyer widthdraw the value
-// if not confirmed the money is locked forever
 
 contract Purchase {
     uint public value;
@@ -55,9 +49,6 @@ contract Purchase {
             revert ValueNotEven();
     }
 
-    /// Abort the purchase and reclaim the ether.
-    /// Can only be called by the seller before
-    /// the contract is locked.
 
     function abort() external onlySeller inState(State.Created){
         emit Aborted();
@@ -65,10 +56,6 @@ contract Purchase {
         seller.transfer(address(this).balance);
     }
 
-    /// Confirm the purchase as buyer.
-    /// Transaction has to include `2 * value` ether.
-    /// The ether will be locked until confirmReceived
-    /// is called.
     function confirmPurchase() 
     external 
     inState(State.Created) 
@@ -80,8 +67,6 @@ contract Purchase {
         state = State.Locked;
     }
 
-    /// Confirm that you (the buyer) received the item.
-    /// This will release the locked ether.
     function confirmReceived()
     external
     onlyBuyer
@@ -92,7 +77,6 @@ contract Purchase {
         buyer.transfer(value);
     }
 
-    // pays back the seller
     function refundSeller()
     external 
     onlySeller
